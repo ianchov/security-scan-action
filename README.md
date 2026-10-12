@@ -95,5 +95,6 @@ bash scripts/security-scan.sh origin/main # commits after origin/main only
 
 Publish a `vX.Y.Z` release. `move-major-tag.yml` then points `v1` at it.
 
-When Renovate merges a change to `action.yml` or `scripts/`, `release.yml` publishes the next
-patch release and moves `v1`.
+When a Renovate pull request that changes `action.yml` or `scripts/` is merged (by Renovate or by
+hand), `release.yml` publishes the next patch release and moves `v1`. Its title and notes list
+the pinned versions that changed.
