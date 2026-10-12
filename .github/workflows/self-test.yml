@@ -23,3 +23,15 @@ jobs:
         with:
           persist-credentials: false
       - uses: ./
+      # This repository has no Python, so the step above skips bandit. Scan a one-file Python
+      # repository too, so a bandit-requirements.txt update that breaks the install fails here.
+      - name: Scan a Python repository (bandit)
+        run: |
+          fixture="$RUNNER_TEMP/python-fixture"
+          git init -q "$fixture"
+          printf 'print("ok")\n' > "$fixture/app.py"
+          git -C "$fixture" add app.py
+          git -C "$fixture" -c user.name=ci -c user.email=ci@example.invalid commit -qm fixture
+          cd "$fixture"
+          bash "$GITHUB_WORKSPACE/scripts/security-scan.sh" | tee "$RUNNER_TEMP/scan.log"
+          grep -qx 'bandit (Python SAST): passed' "$RUNNER_TEMP/scan.log"
