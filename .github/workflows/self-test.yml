@@ -1,0 +1,25 @@
+name: Self test
+# Runs the action on this repository on both architectures, so a version bump with stale SHA-256
+# sums fails here and not in the workflows that use this action. It runs on every PR because it is
+# a required check: a path filter would leave PRs that skip it waiting forever.
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    strategy:
+      fail-fast: false
+      matrix:
+        runner: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: ./

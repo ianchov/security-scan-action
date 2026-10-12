@@ -1,0 +1,33 @@
+name: Pinned Security Scan
+description: Run sha256-verified gitleaks, opengrep, osv-scanner and trivy config, and fail on findings.
+author: ianchov
+branding:
+  icon: shield
+  color: green
+
+inputs:
+  rule-packs:
+    description: >-
+      opengrep-rules directories to load, space or newline separated. Empty uses the Python set:
+      python lang, django, requests, jwt, cryptography, jinja2, GitHub Actions, docker-compose, bash.
+    default: ""
+  exclude:
+    description: >-
+      Extra paths for opengrep and trivy to skip, one per line, for example "app/staticfiles".
+      .venv and test files are always skipped.
+    default: ""
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/checkout@v7
+      with:
+        # gitleaks reads git history; a pull request scans only the commits after its base.
+        fetch-depth: 0
+        persist-credentials: false
+    - shell: bash
+      env:
+        BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
+        RULE_PACKS: ${{ inputs.rule-packs }}
+        SCAN_EXCLUDE: ${{ inputs.exclude }}
+      run: bash "$GITHUB_ACTION_PATH/scripts/security-scan.sh" "$BASE_REF"
