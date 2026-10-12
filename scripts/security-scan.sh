@@ -7,8 +7,8 @@
 #   RULE_PACKS    opengrep-rules directories, space or newline separated (default: Python set)
 #   SCAN_EXCLUDE  extra paths for opengrep and trivy to skip, one per line
 #   SECURITY_SCAN_CACHE  download cache (default: ~/.cache/security-scan)
-# Versions and digests come from upstream checksum files (opengrep: thyn-ai/security-toolchain
-# security/toolchain.lock, cosign-verified there). Bump a tool here and nowhere else.
+# Renovate keeps each tool's release tag and asset sha256 current (see renovate.json). It takes
+# a new digest from the release's checksum file, else from the downloaded asset.
 set -euo pipefail
 shopt -s inherit_errexit
 # opengrep reads its UTF-8 rules with the locale's encoding; a bare container defaults to ASCII.
@@ -25,23 +25,25 @@ case "$(uname -s)-$(uname -m)" in
   *) echo "unsupported platform: $(uname -sm)" >&2; exit 2 ;;
 esac
 
-# tool version platform url sha256 member(empty = plain binary)
+# tool tag platform repo asset sha256 member(empty = plain binary)
+# The asset is downloaded from https://github.com/<repo>/releases/download/<tag>/. In the asset
+# name, {version} stands for the tag without its leading "v".
 tools_table="
-gitleaks 8.30.1 linux-x86_64 https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_x64.tar.gz 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb gitleaks
-gitleaks 8.30.1 linux-aarch64 https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_linux_arm64.tar.gz e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080 gitleaks
-gitleaks 8.30.1 darwin-arm64 https://github.com/gitleaks/gitleaks/releases/download/v8.30.1/gitleaks_8.30.1_darwin_arm64.tar.gz b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5 gitleaks
-opengrep 1.30.0 linux-x86_64 https://github.com/opengrep/opengrep/releases/download/v1.30.0/opengrep_manylinux_x86 35779bdd72e92129c8df2a77f0c55e8c08356801ea92591ef32108d6b28d564c
-opengrep 1.30.0 linux-aarch64 https://github.com/opengrep/opengrep/releases/download/v1.30.0/opengrep_manylinux_aarch64 a5d5a4a58ba5d46ff51e921663da1c2bba38f4b03987f4aeec87f16c6ad3ecae
-opengrep 1.30.0 darwin-arm64 https://github.com/opengrep/opengrep/releases/download/v1.30.0/opengrep_osx_arm64 0f5bc3dec09d995c61331a4017b856ede508f90d95b018d95f1dc6166be89fdd
-osv-scanner 2.6.0 linux-x86_64 https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_amd64 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
-osv-scanner 2.6.0 linux-aarch64 https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_linux_arm64 2c71403eb443d05891c4f268c3ad771cf4f16e5443463fd7851ef8f454d3c7e4
-osv-scanner 2.6.0 darwin-arm64 https://github.com/google/osv-scanner/releases/download/v2.6.0/osv-scanner_darwin_arm64 98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4
-trivy 0.74.0 linux-x86_64 https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-64bit.tar.gz 2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a trivy
-trivy 0.74.0 linux-aarch64 https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_Linux-ARM64.tar.gz b94ce1976bbf3c15b514b605ee88be7c6d94a29be2302847ff01cb794d47aad5 trivy
-trivy 0.74.0 darwin-arm64 https://github.com/aquasecurity/trivy/releases/download/v0.74.0/trivy_0.74.0_macOS-ARM64.tar.gz 1caada5e0e2091909357c7525d3aa76f4b660b13821bc143b190c7483e31cc11 trivy
-uv 0.13.0 linux-x86_64 https://github.com/astral-sh/uv/releases/download/0.13.0/uv-x86_64-unknown-linux-gnu.tar.gz 1468ebd5a5541121837c5a2817b9972ba6090fa6caa3d142620850a47fb75154 uv-x86_64-unknown-linux-gnu/uv
-uv 0.13.0 linux-aarch64 https://github.com/astral-sh/uv/releases/download/0.13.0/uv-aarch64-unknown-linux-gnu.tar.gz 3ccfb6af6e242433eb552f7d9676abd5412c6595c497e990d9c8cb7b5bd4d2c3 uv-aarch64-unknown-linux-gnu/uv
-uv 0.13.0 darwin-arm64 https://github.com/astral-sh/uv/releases/download/0.13.0/uv-aarch64-apple-darwin.tar.gz a9c1b29002cf3c83f07fa9cd8a887a3be0107d90e23189721221e7257db8e3d6 uv-aarch64-apple-darwin/uv
+gitleaks v8.30.1 linux-x86_64 gitleaks/gitleaks gitleaks_{version}_linux_x64.tar.gz 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb gitleaks
+gitleaks v8.30.1 linux-aarch64 gitleaks/gitleaks gitleaks_{version}_linux_arm64.tar.gz e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080 gitleaks
+gitleaks v8.30.1 darwin-arm64 gitleaks/gitleaks gitleaks_{version}_darwin_arm64.tar.gz b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5 gitleaks
+opengrep v1.30.0 linux-x86_64 opengrep/opengrep opengrep_manylinux_x86 35779bdd72e92129c8df2a77f0c55e8c08356801ea92591ef32108d6b28d564c
+opengrep v1.30.0 linux-aarch64 opengrep/opengrep opengrep_manylinux_aarch64 a5d5a4a58ba5d46ff51e921663da1c2bba38f4b03987f4aeec87f16c6ad3ecae
+opengrep v1.30.0 darwin-arm64 opengrep/opengrep opengrep_osx_arm64 0f5bc3dec09d995c61331a4017b856ede508f90d95b018d95f1dc6166be89fdd
+osv-scanner v2.6.0 linux-x86_64 google/osv-scanner osv-scanner_linux_amd64 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
+osv-scanner v2.6.0 linux-aarch64 google/osv-scanner osv-scanner_linux_arm64 2c71403eb443d05891c4f268c3ad771cf4f16e5443463fd7851ef8f454d3c7e4
+osv-scanner v2.6.0 darwin-arm64 google/osv-scanner osv-scanner_darwin_arm64 98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4
+trivy v0.74.0 linux-x86_64 aquasecurity/trivy trivy_{version}_Linux-64bit.tar.gz 2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a trivy
+trivy v0.74.0 linux-aarch64 aquasecurity/trivy trivy_{version}_Linux-ARM64.tar.gz b94ce1976bbf3c15b514b605ee88be7c6d94a29be2302847ff01cb794d47aad5 trivy
+trivy v0.74.0 darwin-arm64 aquasecurity/trivy trivy_{version}_macOS-ARM64.tar.gz 1caada5e0e2091909357c7525d3aa76f4b660b13821bc143b190c7483e31cc11 trivy
+uv 0.13.0 linux-x86_64 astral-sh/uv uv-x86_64-unknown-linux-gnu.tar.gz 1468ebd5a5541121837c5a2817b9972ba6090fa6caa3d142620850a47fb75154 uv-x86_64-unknown-linux-gnu/uv
+uv 0.13.0 linux-aarch64 astral-sh/uv uv-aarch64-unknown-linux-gnu.tar.gz 3ccfb6af6e242433eb552f7d9676abd5412c6595c497e990d9c8cb7b5bd4d2c3 uv-aarch64-unknown-linux-gnu/uv
+uv 0.13.0 darwin-arm64 astral-sh/uv uv-aarch64-apple-darwin.tar.gz a9c1b29002cf3c83f07fa9cd8a887a3be0107d90e23189721221e7257db8e3d6 uv-aarch64-apple-darwin/uv
 "
 rules_commit=f1d2b562b414783763fd02a6ed2736eaed622efa
 rules_sha256=9a5f1cd5c625418cc1c776120123e2d4371df9bb66e099426b17c3488e13619d
@@ -72,8 +74,10 @@ fetch() {
 }
 
 install_tool() {
-  local name=$1 version url sum member dir
-  read -r _ version _ url sum member < <(awk -v n="$name" -v p="$platform" '$1 == n && $3 == p' <<<"$tools_table")
+  local name=$1 tag repo asset sum member version url dir
+  read -r _ tag _ repo asset sum member < <(awk -v n="$name" -v p="$platform" '$1 == n && $3 == p' <<<"$tools_table")
+  version="${tag#v}"
+  url="https://github.com/$repo/releases/download/$tag/${asset//"{version}"/$version}"
   dir="$cache/$name-$version"
   mkdir -p "$dir"
   # Only the archive is hashed, so extract it on every run: a cached binary is never trusted.

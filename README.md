@@ -66,12 +66,19 @@ Exceptions live in the scanned repository:
 
 ## Pinning
 
-`scripts/security-scan.sh` holds each tool's version and the sha256 of each release asset for
-Linux x86_64, Linux aarch64 and macOS arm64. Nothing runs before its digest matches. The digests
-come from each tool's upstream checksum file. opengrep publishes none: its digests and the
-opengrep-rules commit come from
+`scripts/security-scan.sh` holds each tool's release tag and the sha256 of each release asset for
+Linux x86_64, Linux aarch64 and macOS arm64. Nothing runs before its digest matches. The first
+digests came from each tool's upstream checksum file. opengrep publishes none: its first digests
+and the opengrep-rules commit came from
 [thyn-ai/security-toolchain](https://github.com/thyn-ai/security-toolchain)'s
 `security/toolchain.lock`, which verified them with cosign.
+
+Renovate updates the tags and digests together. It takes each new digest from the release's
+checksum file, else it downloads the asset and hashes it (opengrep). It also updates the packages
+and hashes in `scripts/bandit-requirements.txt`. It waits 3 days after a release, then merges
+minor and patch updates when `Self test` passes. `Self test` also scans a one-file Python
+repository, so a bandit update that does not install fails. Major updates stay open for review.
+Renovate does not update the opengrep-rules commit.
 
 Downloads are cached in `~/.cache/security-scan` (`SECURITY_SCAN_CACHE`). Only the downloaded
 archives are cached; each run re-checks them and extracts them again, so a changed cached file is
@@ -87,3 +94,6 @@ bash scripts/security-scan.sh origin/main # commits after origin/main only
 ## Releases
 
 Publish a `vX.Y.Z` release. `move-major-tag.yml` then points `v1` at it.
+
+When Renovate merges a change to `action.yml` or `scripts/`, `release.yml` publishes the next
+patch release and moves `v1`.

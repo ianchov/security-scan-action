@@ -6,26 +6,36 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Update pinned release versions in scripts/install.sh",
+      "description": "Scanner release tags and asset sha256 sums in scripts/security-scan.sh. One dependency per table row, so each platform's digest is updated.",
       "managerFilePatterns": [
-        "/^scripts/install\\.sh$/"
+        "/^scripts/security-scan\\.sh$/"
       ],
       "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-z-]+) depName=(?<depName>\\S+)\\s+[A-Z_]+_VERSION=\"(?<currentValue>[^\"]+)\""
+        "\\n(?<depName>[a-z-]+) (?<currentValue>\\S+) [\\w-]+ (?<packageName>[\\w.-]+/[\\w.-]+) \\S+ (?<currentDigest>[0-9a-f]{64})"
       ],
-      "extractVersionTemplate": "^v(?<version>.+)$",
-      "versioningTemplate": "semver"
+      "datasourceTemplate": "github-release-attachments"
     }
   ],
   "packageRules": [
     {
-      "matchDepNames": [
-        "unreallabsai/unreal-agent",
-        "nolabs-ai/nono"
+      "description": "Scanners (scripts/security-scan.sh) and bandit with its hash-locked packages (scripts/bandit-requirements.txt): wait 3 days after a release, then Renovate merges minor and patch updates once Self test passes.",
+      "matchFileNames": [
+        "scripts/security-scan.sh",
+        "scripts/bandit-requirements.txt"
       ],
-      "prBodyNotes": [
-        "**Before you merge:** this PR changes only the version. Copy the `linux_amd64` and `linux_arm64` SHA-256 sums from the release's `SHA256SUMS` (Unreal Agent) or `SHA256SUMS.txt` (nono) into `scripts/install.sh`. The `Install check` workflow fails until the sums match. See \"Updating pinned versions\" in the README."
-      ]
+      "minimumReleaseAge": "3 days"
+    },
+    {
+      "matchFileNames": [
+        "scripts/security-scan.sh",
+        "scripts/bandit-requirements.txt"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": true,
+      "platformAutomerge": false
     }
   ]
 }
