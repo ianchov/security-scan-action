@@ -88,14 +88,15 @@ install_tool() {
 }
 
 # bandit from scripts/bandit-requirements.txt (hash-locked) into this run's temporary venv.
-# uv picks the repository's Python (.python-version or requires-python) and downloads it if
-# missing, so bandit parses the code with the syntax the project uses.
+# uv picks the repository's Python (.python-version, else requires-python) and downloads it if
+# missing, so bandit parses the code with the syntax the project uses. The install ignores the
+# repository's uv config (--no-config), so a private index in pyproject.toml cannot break it.
 install_bandit() {
   local uv venv="$work/bandit-venv"
   uv="$(install_tool uv)"
   export UV_CACHE_DIR="$cache/uv" UV_PYTHON_INSTALL_DIR="$cache/python"
-  (cd "$repo_root" && "$uv" venv --quiet --no-project "$venv")
-  "$uv" pip install --quiet --require-hashes --python "$venv/bin/python" \
+  (cd "$repo_root" && "$uv" venv --quiet "$venv")
+  "$uv" --no-config pip install --quiet --require-hashes --python "$venv/bin/python" \
     -r "$script_dir/bandit-requirements.txt"
   echo "$venv/bin/bandit"
 }
@@ -148,7 +149,7 @@ while IFS= read -r path; do
   excludes+=("${path%/}")
   opengrep_args+=(--exclude "$path")
   trivy_args+=(--skip-dirs "$path")
-  osv_args+=(--experimental-exclude "g:${path%/}/**")
+  osv_args+=(--experimental-exclude "${path%/}")
 done <<<"${SCAN_EXCLUDE:-}"
 for pack in $rule_packs; do opengrep_args+=(--config "$rules/$pack"); done
 run "opengrep (SAST)" "$opengrep" scan --error --severity ERROR "${opengrep_args[@]}" .

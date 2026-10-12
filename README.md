@@ -16,9 +16,9 @@ All scanners always run; the job fails after the last one if any failed.
 
 bandit catches what the opengrep ERROR gate lets through, such as `pickle.loads` and `eval`.
 It runs from a temporary venv built with a pinned uv from `scripts/bandit-requirements.txt`,
-which pins every package by hash. uv uses the repository's Python version (`.python-version` or
-`requires-python`) and downloads it when the runner lacks it, so bandit parses the project's
-syntax.
+which pins every package by hash. uv uses the repository's Python version (`.python-version`,
+else `requires-python`) and downloads it when the runner lacks it, so bandit parses the
+project's syntax. The install ignores the repository's uv settings, such as a private index.
 
 osv-scanner reads lockfiles only (`uv.lock`, `poetry.lock`, `requirements.txt`,
 `package-lock.json`, ...), skips `.gitignore`d paths and the `exclude` input, and fails on any
