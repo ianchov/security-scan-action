@@ -38,9 +38,9 @@ opengrep v1.30.2 darwin-arm64 opengrep/opengrep opengrep_osx_arm64 f1aaa30b88959
 osv-scanner v2.6.0 linux-x86_64 google/osv-scanner osv-scanner_linux_amd64 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
 osv-scanner v2.6.0 linux-aarch64 google/osv-scanner osv-scanner_linux_arm64 2c71403eb443d05891c4f268c3ad771cf4f16e5443463fd7851ef8f454d3c7e4
 osv-scanner v2.6.0 darwin-arm64 google/osv-scanner osv-scanner_darwin_arm64 98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4
-trivy v0.74.0 linux-x86_64 aquasecurity/trivy trivy_{version}_Linux-64bit.tar.gz 2ae6fe3ee734b7fdf11335663e18c75ea12dccc76062f09f164a3b0f8be4371a trivy
-trivy v0.74.0 linux-aarch64 aquasecurity/trivy trivy_{version}_Linux-ARM64.tar.gz b94ce1976bbf3c15b514b605ee88be7c6d94a29be2302847ff01cb794d47aad5 trivy
-trivy v0.74.0 darwin-arm64 aquasecurity/trivy trivy_{version}_macOS-ARM64.tar.gz 1caada5e0e2091909357c7525d3aa76f4b660b13821bc143b190c7483e31cc11 trivy
+trivy v0.75.0 linux-x86_64 aquasecurity/trivy trivy_{version}_Linux-64bit.tar.gz c6e65abddb348e25f10549df887045629cf28cc72453cd1c63acb717316b3f3f trivy
+trivy v0.75.0 linux-aarch64 aquasecurity/trivy trivy_{version}_Linux-ARM64.tar.gz a1ee9f6ffb7d112b64ff726a2a0717c21175c1114361391f4a132956751a13b3 trivy
+trivy v0.75.0 darwin-arm64 aquasecurity/trivy trivy_{version}_macOS-ARM64.tar.gz 4a77108cccf8e55c8d6823e1e759939a622277e66cd0daa3c1fc621ed69e4568 trivy
 uv 0.13.0 linux-x86_64 astral-sh/uv uv-x86_64-unknown-linux-gnu.tar.gz 1468ebd5a5541121837c5a2817b9972ba6090fa6caa3d142620850a47fb75154 uv-x86_64-unknown-linux-gnu/uv
 uv 0.13.0 linux-aarch64 astral-sh/uv uv-aarch64-unknown-linux-gnu.tar.gz 3ccfb6af6e242433eb552f7d9676abd5412c6595c497e990d9c8cb7b5bd4d2c3 uv-aarch64-unknown-linux-gnu/uv
 uv 0.13.0 darwin-arm64 astral-sh/uv uv-aarch64-apple-darwin.tar.gz a9c1b29002cf3c83f07fa9cd8a887a3be0107d90e23189721221e7257db8e3d6 uv-aarch64-apple-darwin/uv
