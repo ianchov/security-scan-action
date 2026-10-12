@@ -14,21 +14,46 @@
         "\\n(?<depName>[a-z-]+) (?<currentValue>\\S+) [\\w-]+ (?<packageName>[\\w.-]+/[\\w.-]+) \\S+ (?<currentDigest>[0-9a-f]{64})"
       ],
       "datasourceTemplate": "github-release-attachments"
+    },
+    {
+      "customType": "regex",
+      "description": "Scanner versions in the README table. Same depName as the scripts/security-scan.sh rows, so Renovate puts both in one pull request.",
+      "managerFilePatterns": [
+        "/^README\\.md$/"
+      ],
+      "matchStrings": [
+        "\\[(?<depName>gitleaks|opengrep|osv-scanner|trivy)\\]\\(https://github\\.com/(?<packageName>[\\w.-]+/[\\w.-]+)\\)(?: `config`)? (?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "github-releases",
+      "extractVersionTemplate": "^v?(?<version>.+)$"
+    },
+    {
+      "customType": "regex",
+      "description": "bandit version in the README table. Same depName as scripts/bandit-requirements.txt, so Renovate puts both in one pull request.",
+      "managerFilePatterns": [
+        "/^README\\.md$/"
+      ],
+      "matchStrings": [
+        "\\[(?<depName>bandit)\\]\\(https://github\\.com/[^)]+\\) (?<currentValue>\\d+\\.\\d+\\.\\d+)"
+      ],
+      "datasourceTemplate": "pypi"
     }
   ],
   "packageRules": [
     {
-      "description": "Scanners (scripts/security-scan.sh) and bandit with its hash-locked packages (scripts/bandit-requirements.txt): wait 3 days after a release, then Renovate merges minor and patch updates once Self test passes.",
+      "description": "Scanners (scripts/security-scan.sh), bandit with its hash-locked packages (scripts/bandit-requirements.txt) and their versions in README.md: wait 3 days after a release, then Renovate merges minor and patch updates once Self test passes.",
       "matchFileNames": [
         "scripts/security-scan.sh",
-        "scripts/bandit-requirements.txt"
+        "scripts/bandit-requirements.txt",
+        "README.md"
       ],
       "minimumReleaseAge": "3 days"
     },
     {
       "matchFileNames": [
         "scripts/security-scan.sh",
-        "scripts/bandit-requirements.txt"
+        "scripts/bandit-requirements.txt",
+        "README.md"
       ],
       "matchUpdateTypes": [
         "minor",
