@@ -11,6 +11,8 @@
 # security/toolchain.lock, cosign-verified there). Bump a tool here and nowhere else.
 set -euo pipefail
 shopt -s inherit_errexit
+# opengrep reads its UTF-8 rules with the locale's encoding; a bare container defaults to ASCII.
+export LANG=C.UTF-8 LC_ALL=C.UTF-8 PYTHONUTF8=1
 
 base_ref="${1:-}"
 cache="${SECURITY_SCAN_CACHE:-$HOME/.cache/security-scan}"
