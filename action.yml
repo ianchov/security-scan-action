@@ -1,5 +1,5 @@
 name: Pinned Security Scan
-description: Run sha256-verified gitleaks, opengrep, osv-scanner and trivy config, and fail on findings.
+description: Run sha256-verified gitleaks, opengrep, bandit, osv-scanner and trivy config, and fail on findings.
 author: ianchov
 branding:
   icon: shield
@@ -13,7 +13,7 @@ inputs:
     default: ""
   exclude:
     description: >-
-      Extra paths for opengrep and trivy to skip, one per line, for example "app/staticfiles".
+      Extra paths for opengrep, bandit, osv-scanner and trivy to skip, one per line, for example "app/staticfiles".
       .venv and test files are always skipped.
     default: ""
 
