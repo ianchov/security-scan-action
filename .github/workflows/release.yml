@@ -25,6 +25,10 @@ jobs:
     env:
       GH_TOKEN: ${{ github.token }}
     steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
       - name: Publish patch release
         id: publish
         run: |
@@ -37,7 +41,10 @@ jobs:
           fi
           IFS=. read -r major minor patch <<<"${latest#v}"
           tag="v$major.$minor.$((patch + 1))"
-          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$tag" --generate-notes
+          bash .github/scripts/release-notes.sh "$tag" "$latest" "$GITHUB_SHA" > "$RUNNER_TEMP/notes.md"
+          title=$(head -n 1 "$RUNNER_TEMP/notes.md")
+          tail -n +2 "$RUNNER_TEMP/notes.md" > "$RUNNER_TEMP/body.md"
+          gh release create "$tag" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title "$title" --notes-file "$RUNNER_TEMP/body.md"
           echo "tag=$tag" >> "$GITHUB_OUTPUT"
           echo "::notice::Published $tag ($GITHUB_SHA)."
 
