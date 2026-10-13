@@ -8,8 +8,9 @@ branding:
 inputs:
   rule-packs:
     description: >-
-      opengrep-rules directories to load, space or newline separated. Empty uses the Python set:
-      python lang, django, requests, jwt, cryptography, jinja2, GitHub Actions, docker-compose, bash.
+      opengrep-rules directories to load, space or newline separated. Globs such as javascript/*/security work.
+      Empty uses the default set: Python (lang, django, requests, jwt, cryptography, jinja2), GitHub Actions,
+      docker-compose, bash, JSON, JavaScript, Go, Rust and HTML security rules.
     default: ""
   exclude:
     description: >-
