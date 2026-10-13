@@ -89,6 +89,7 @@ install_tool() {
     fetch "$url" "$sum" "$dir/$name"
     chmod +x "$dir/$name"
   fi
+  echo "| $name | $version | \`$sum\` | $url |" >>"$work/tools.md"
   echo "$dir/${member:-$name}"
 }
 
@@ -131,12 +132,20 @@ bandit=""
 
 cd "$repo_root"
 failed=()
+results=()
 
 run() {
   local label=$1
   shift
   echo "::group::$label"
-  if "$@"; then echo "$label: passed"; else echo "$label: FAILED"; failed+=("$label"); fi
+  if "$@"; then
+    echo "$label: passed"
+    results+=("| $label | passed |")
+  else
+    echo "$label: FAILED"
+    results+=("| $label | **FAILED** |")
+    failed+=("$label")
+  fi
   echo "::endgroup::"
 }
 
@@ -192,6 +201,54 @@ run "osv-scanner (dependencies)" "$osv" scan source --recursive --allow-no-lockf
 
 run "trivy config (IaC)" "$trivy" config --quiet --exit-code 1 --severity HIGH,CRITICAL \
   "${trivy_args[@]}" .
+
+# What ran and with which pins, rules and scope: in the log, and in the job summary on Actions.
+write_summary() {
+  echo "## Security scan"
+  echo
+  echo "| Scanner | Result |"
+  echo "|---|---|"
+  printf '%s\n' "${results[@]}"
+  echo
+  echo "### Pinned tools ($platform)"
+  echo
+  echo "Each download runs only after its sha256 matches."
+  echo
+  echo "| Tool | Version | sha256 | Source |"
+  echo "|---|---|---|---|"
+  cat "$work/tools.md"
+  echo
+  echo "### opengrep rules"
+  echo
+  echo "[opengrep-rules@${rules_commit:0:12}](https://github.com/opengrep/opengrep-rules/tree/$rules_commit)" \
+    "(archive sha256 \`$rules_sha256\`). Only ERROR-severity findings fail. Packs:"
+  echo
+  # shellcheck disable=SC2016 # literal Markdown backticks
+  printf -- '- `%s`\n' "${packs[@]}"
+  if [ -n "$bandit" ]; then
+    echo
+    echo "### bandit packages (hash-locked)"
+    echo
+    awk -F'==' '/^[A-Za-z0-9_.-]+==/ { split($2, v, /[ ;]/); printf "- %s %s\n", $1, v[1] }' \
+      "$script_dir/bandit-requirements.txt"
+  fi
+  echo
+  echo "### Scope"
+  echo
+  echo "- gitleaks: the full git history."
+  echo "- opengrep, bandit: committed and uncommitted files, without .gitignore'd files, .venv and test files."
+  echo "- osv-scanner: lockfiles, without .gitignore'd paths."
+  echo "- trivy config: IaC files, without .venv."
+  if [ ${#excludes[@]} -gt 0 ]; then
+    # shellcheck disable=SC2016 # literal Markdown backticks
+    echo "- Excluded by the exclude input: $(printf '`%s` ' "${excludes[@]}")"
+  fi
+}
+write_summary >"$work/summary.md"
+echo "::group::Scan summary"
+cat "$work/summary.md"
+echo "::endgroup::"
+[ -z "${GITHUB_STEP_SUMMARY:-}" ] || cat "$work/summary.md" >>"$GITHUB_STEP_SUMMARY"
 
 if [ ${#failed[@]} -gt 0 ]; then
   echo "Failed: ${failed[*]}" >&2

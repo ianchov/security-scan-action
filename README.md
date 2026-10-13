@@ -14,6 +14,10 @@ workflow in [ianchov/security-scan](https://github.com/ianchov/security-scan).
 
 All scanners always run; the job fails after the last one if any failed.
 
+Each run writes a summary to the log and to the job summary page: the result of each scanner, the
+version, sha256 and source of each tool, the opengrep-rules commit and packs, the bandit packages,
+and what each scanner skips. Reviewers see what ran without opening this repository.
+
 bandit catches what the opengrep ERROR gate lets through, such as `pickle.loads` and `eval`.
 It runs from a temporary venv built with a pinned uv from `scripts/bandit-requirements.txt`,
 which pins every package by hash. uv uses the repository's Python version (`.python-version`,
