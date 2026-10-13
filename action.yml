@@ -22,12 +22,11 @@ runs:
   steps:
     - uses: actions/checkout@v7
       with:
-        # gitleaks reads git history; a pull request scans only the commits after its base.
+        # gitleaks scans the full git history, on pull requests too.
         fetch-depth: 0
         persist-credentials: false
     - shell: bash
       env:
-        BASE_REF: ${{ github.event_name == 'pull_request' && format('origin/{0}', github.base_ref) || '' }}
         RULE_PACKS: ${{ inputs.rule-packs }}
         SCAN_EXCLUDE: ${{ inputs.exclude }}
-      run: bash "$GITHUB_ACTION_PATH/scripts/security-scan.sh" "$BASE_REF"
+      run: bash "$GITHUB_ACTION_PATH/scripts/security-scan.sh"
