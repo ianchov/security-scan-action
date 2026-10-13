@@ -117,7 +117,8 @@ install_rules() {
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-mapfile -t python_files < <(git -C "$repo_root" ls-files '*.py')
+# Committed and uncommitted .py files, minus .gitignore'd ones: the files opengrep scans too.
+mapfile -t python_files < <(git -C "$repo_root" ls-files --cached --others --exclude-standard '*.py')
 
 gitleaks="$(install_tool gitleaks)"
 opengrep="$(install_tool opengrep)"
@@ -158,7 +159,7 @@ done <<<"${SCAN_EXCLUDE:-}"
 for pack in $rule_packs; do opengrep_args+=(--config "$rules/$pack"); done
 run "opengrep (SAST)" "$opengrep" scan --error --severity ERROR "${opengrep_args[@]}" .
 
-# bandit: Python only, tracked files, medium and high severity. Same test scope as opengrep.
+# bandit: Python only, medium and high severity. Same files and test scope as opengrep.
 # A [tool.bandit] table in pyproject.toml applies (skips, extra excludes).
 bandit_scan() {
   local file prefix targets=() args=(-q -ll)

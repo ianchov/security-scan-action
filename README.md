@@ -8,7 +8,7 @@ workflow in [ianchov/security-scan](https://github.com/ianchov/security-scan).
 |---|---|---|
 | Secrets | [gitleaks](https://github.com/gitleaks/gitleaks) 8.30.1 | any secret; on a pull request, only in commits after the base |
 | SAST | [opengrep](https://github.com/opengrep/opengrep) 1.30.2 | ERROR-severity findings |
-| Python SAST | [bandit](https://github.com/PyCQA/bandit) 1.9.4, only when the repository tracks `.py` files | MEDIUM and HIGH severity findings |
+| Python SAST | [bandit](https://github.com/PyCQA/bandit) 1.9.4, only when the repository has `.py` files | MEDIUM and HIGH severity findings |
 | Dependencies | [osv-scanner](https://github.com/google/osv-scanner) 2.6.0 | any known vulnerability in a lockfile; a repository without one passes |
 | Dockerfile, IaC | [trivy](https://github.com/aquasecurity/trivy) `config` 0.75.0 | HIGH and CRITICAL misconfigurations |
 
@@ -19,6 +19,8 @@ It runs from a temporary venv built with a pinned uv from `scripts/bandit-requir
 which pins every package by hash. uv uses the repository's Python version (`.python-version`,
 else `requires-python`) and downloads it when the runner lacks it, so bandit parses the
 project's syntax. The install ignores the repository's uv settings, such as a private index.
+
+opengrep and bandit scan committed and uncommitted files, but not `.gitignore`d ones.
 
 osv-scanner reads lockfiles only (`uv.lock`, `poetry.lock`, `requirements.txt`,
 `package-lock.json`, ...), skips `.gitignore`d paths and the `exclude` input, and fails on any
