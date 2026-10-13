@@ -6,7 +6,7 @@ workflow in [ianchov/security-scan](https://github.com/ianchov/security-scan).
 
 | Category | Scanner | Fails on |
 |---|---|---|
-| Secrets | [gitleaks](https://github.com/gitleaks/gitleaks) 8.30.1 | any secret; on a pull request, only in commits after the base |
+| Secrets | [gitleaks](https://github.com/gitleaks/gitleaks) 8.30.1 | any secret in the full git history, on pull requests too |
 | SAST | [opengrep](https://github.com/opengrep/opengrep) 1.30.2 | ERROR-severity findings |
 | Python SAST | [bandit](https://github.com/PyCQA/bandit) 1.9.4, only when the repository tracks `.py` files | MEDIUM and HIGH severity findings |
 | Dependencies | [osv-scanner](https://github.com/google/osv-scanner) 2.6.0 | any known vulnerability in a lockfile; a repository without one passes |
@@ -87,8 +87,7 @@ never run.
 ## Run locally
 
 ```bash
-bash scripts/security-scan.sh             # full history
-bash scripts/security-scan.sh origin/main # commits after origin/main only
+bash scripts/security-scan.sh
 ```
 
 ## Releases

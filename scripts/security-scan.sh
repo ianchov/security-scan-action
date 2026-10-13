@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 # Install pinned, sha256-verified scanners and run them on the repository.
-#   security-scan.sh [BASE_REF]
-# BASE_REF limits gitleaks to the commits after it (a pull request's base). Without it,
-# gitleaks scans the full history. Exit status is non-zero when any scanner fails.
+#   security-scan.sh
+# Scans the whole repository: gitleaks reads the full git history, the other scanners every file.
+# Exit status is non-zero when any scanner fails.
 # Environment:
 #   RULE_PACKS    opengrep-rules directories, space or newline separated (default: Python set)
 #   SCAN_EXCLUDE  extra paths for opengrep and trivy to skip, one per line
@@ -14,7 +14,6 @@ shopt -s inherit_errexit
 # opengrep reads its UTF-8 rules with the locale's encoding; a bare container defaults to ASCII.
 export LANG=C.UTF-8 LC_ALL=C.UTF-8 PYTHONUTF8=1
 
-base_ref="${1:-}"
 cache="${SECURITY_SCAN_CACHE:-$HOME/.cache/security-scan}"
 repo_root="$(git rev-parse --show-toplevel)"
 
@@ -138,9 +137,7 @@ run() {
   echo "::endgroup::"
 }
 
-gitleaks_args=(git --redact --no-banner --exit-code 1)
-[ -n "$base_ref" ] && gitleaks_args+=(--log-opts "$base_ref..HEAD")
-run "gitleaks (secrets)" "$gitleaks" "${gitleaks_args[@]}" .
+run "gitleaks (secrets)" "$gitleaks" git --redact --no-banner --exit-code 1 .
 
 # Test code is out of SAST scope: what it finds there is fixtures, not defects.
 opengrep_args=(--exclude .venv --exclude tests --exclude tests.py --exclude 'test_*.py'
