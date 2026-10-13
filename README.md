@@ -52,7 +52,7 @@ persisted credentials.
 
 | Input | Default | Meaning |
 |---|---|---|
-| `rule-packs` | Python set | [opengrep-rules](https://github.com/opengrep/opengrep-rules) directories, space or newline separated. The default: `python/{lang,django,requests,jwt,cryptography,jinja2}/security`, `yaml/github-actions/security`, `yaml/docker-compose/security`, `bash/lang/security`. |
+| `rule-packs` | default set | [opengrep-rules](https://github.com/opengrep/opengrep-rules) directories, space or newline separated. Globs such as `javascript/*/security` work. The default: `python/{lang,django,requests,jwt,cryptography,jinja2}/security`, `yaml/github-actions/security`, `yaml/docker-compose/security`, `bash/*/security`, `json/*/security`, `javascript/*/security`, `go/*/security`, `rust/*/security`, `html/security`. |
 | `exclude` | empty | Extra paths for opengrep, bandit, osv-scanner and trivy to skip, one per line. `.venv` and test files (`tests/`, `tests.py`, `test_*.py`, `*_test.py`, `conftest.py`) are always skipped by opengrep and bandit. |
 
 ## Exceptions

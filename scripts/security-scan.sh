@@ -4,7 +4,7 @@
 # Scans the whole repository: gitleaks reads the full git history, the other scanners every file.
 # Exit status is non-zero when any scanner fails.
 # Environment:
-#   RULE_PACKS    opengrep-rules directories, space or newline separated (default: Python set)
+#   RULE_PACKS    opengrep-rules directories (globs allowed), space or newline separated
 #   SCAN_EXCLUDE  extra paths for opengrep and trivy to skip, one per line
 #   SECURITY_SCAN_CACHE  download cache (default: ~/.cache/security-scan)
 # Renovate keeps each tool's release tag and asset sha256 current (see renovate.json). It takes
@@ -47,10 +47,12 @@ uv 0.13.0 darwin-arm64 astral-sh/uv uv-aarch64-apple-darwin.tar.gz a9c1b29002cf3
 rules_commit=f1d2b562b414783763fd02a6ed2736eaed622efa
 rules_sha256=9a5f1cd5c625418cc1c776120123e2d4371df9bb66e099426b17c3488e13619d
 # Secrets belong to gitleaks, Dockerfiles to trivy, so no generic/secrets or dockerfile packs.
+# A pack may be a glob inside opengrep-rules, such as javascript/*/security.
 rule_packs="${RULE_PACKS:-
 python/lang/security python/django/security python/requests/security python/jwt/security
 python/cryptography/security python/jinja2/security yaml/github-actions/security
-yaml/docker-compose/security bash/lang/security
+yaml/docker-compose/security bash/*/security json/*/security javascript/*/security
+go/*/security rust/*/security html/security
 }"
 
 sha256() {
@@ -153,7 +155,14 @@ while IFS= read -r path; do
   trivy_args+=(--skip-dirs "$path")
   osv_args+=(--experimental-exclude "${path%/}")
 done <<<"${SCAN_EXCLUDE:-}"
-for pack in $rule_packs; do opengrep_args+=(--config "$rules/$pack"); done
+# Split without globbing against the scanned repository, then glob inside the rules tree.
+mapfile -t packs < <(tr -s ' \t' '\n' <<<"$rule_packs" | grep -v '^$')
+for pack in "${packs[@]}"; do
+  for dir in "$rules"/$pack; do
+    [ -e "$dir" ] || { echo "opengrep rule pack not found: $pack" >&2; exit 2; }
+    opengrep_args+=(--config "$dir")
+  done
+done
 run "opengrep (SAST)" "$opengrep" scan --error --severity ERROR "${opengrep_args[@]}" .
 
 # bandit: Python only, medium and high severity. Same files and test scope as opengrep.
