@@ -34,9 +34,9 @@ gitleaks v8.30.1 darwin-arm64 gitleaks/gitleaks gitleaks_{version}_darwin_arm64.
 opengrep v1.30.2 linux-x86_64 opengrep/opengrep opengrep_manylinux_x86 a66aa3278457f02b287b985a45b6762aebcaba5000f2689245fd1ed86d1456c7
 opengrep v1.30.2 linux-aarch64 opengrep/opengrep opengrep_manylinux_aarch64 90acea5df4b733083f388d4feeb250ca802f671b33d1f222653d1e571dd2b0d8
 opengrep v1.30.2 darwin-arm64 opengrep/opengrep opengrep_osx_arm64 f1aaa30b88959cb82522c4e1475816278a1f161f994509a518453c0455f9d24b
-osv-scanner v2.6.0 linux-x86_64 google/osv-scanner osv-scanner_linux_amd64 ca69b3d3cd08f889a49dc0a383122f71cc528b83803671df5fd874d97485b108
-osv-scanner v2.6.0 linux-aarch64 google/osv-scanner osv-scanner_linux_arm64 2c71403eb443d05891c4f268c3ad771cf4f16e5443463fd7851ef8f454d3c7e4
-osv-scanner v2.6.0 darwin-arm64 google/osv-scanner osv-scanner_darwin_arm64 98c460dcd37de25819babd757d04542045b6243113e209edcd4d89fedb0256b4
+osv-scanner v2.7.0 linux-x86_64 google/osv-scanner osv-scanner_linux_amd64 160c6253e2922e9e0a6a9771c5c4c40a4b3c6090b34a3cdd5e80c96cc2e4218b
+osv-scanner v2.7.0 linux-aarch64 google/osv-scanner osv-scanner_linux_arm64 4061ef4c021ed3c47f203b818f337e351336cc5cd67c0274fc36bd1dfc728dd7
+osv-scanner v2.7.0 darwin-arm64 google/osv-scanner osv-scanner_darwin_arm64 d4926ef8da134332543be276dff157e4c170f99ad91fc48e89448a8816bdf70b
 trivy v0.75.0 linux-x86_64 aquasecurity/trivy trivy_{version}_Linux-64bit.tar.gz c6e65abddb348e25f10549df887045629cf28cc72453cd1c63acb717316b3f3f trivy
 trivy v0.75.0 linux-aarch64 aquasecurity/trivy trivy_{version}_Linux-ARM64.tar.gz a1ee9f6ffb7d112b64ff726a2a0717c21175c1114361391f4a132956751a13b3 trivy
 trivy v0.75.0 darwin-arm64 aquasecurity/trivy trivy_{version}_macOS-ARM64.tar.gz 4a77108cccf8e55c8d6823e1e759939a622277e66cd0daa3c1fc621ed69e4568 trivy
