@@ -10,7 +10,7 @@ workflow in [ianchov/security-scan](https://github.com/ianchov/security-scan).
 | SAST | [opengrep](https://github.com/opengrep/opengrep) 1.30.2 | ERROR-severity findings |
 | Python SAST | [bandit](https://github.com/PyCQA/bandit) 1.9.4, only when the repository has `.py` files | MEDIUM and HIGH severity findings |
 | Dependencies | [osv-scanner](https://github.com/google/osv-scanner) 2.7.0 | any known vulnerability in a lockfile; a repository without one passes |
-| Dockerfile, IaC | [trivy](https://github.com/aquasecurity/trivy) `config` 0.75.0 | HIGH and CRITICAL misconfigurations |
+| Dockerfile, IaC | [trivy](https://github.com/aquasecurity/trivy) `config` 0.76.0 | HIGH and CRITICAL misconfigurations |
 
 All scanners always run; the job fails after the last one if any failed.
 
