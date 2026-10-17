@@ -40,9 +40,9 @@ osv-scanner v2.7.0 darwin-arm64 google/osv-scanner osv-scanner_darwin_arm64 d492
 trivy v0.75.0 linux-x86_64 aquasecurity/trivy trivy_{version}_Linux-64bit.tar.gz c6e65abddb348e25f10549df887045629cf28cc72453cd1c63acb717316b3f3f trivy
 trivy v0.75.0 linux-aarch64 aquasecurity/trivy trivy_{version}_Linux-ARM64.tar.gz a1ee9f6ffb7d112b64ff726a2a0717c21175c1114361391f4a132956751a13b3 trivy
 trivy v0.75.0 darwin-arm64 aquasecurity/trivy trivy_{version}_macOS-ARM64.tar.gz 4a77108cccf8e55c8d6823e1e759939a622277e66cd0daa3c1fc621ed69e4568 trivy
-uv 0.13.0 linux-x86_64 astral-sh/uv uv-x86_64-unknown-linux-gnu.tar.gz 1468ebd5a5541121837c5a2817b9972ba6090fa6caa3d142620850a47fb75154 uv-x86_64-unknown-linux-gnu/uv
-uv 0.13.0 linux-aarch64 astral-sh/uv uv-aarch64-unknown-linux-gnu.tar.gz 3ccfb6af6e242433eb552f7d9676abd5412c6595c497e990d9c8cb7b5bd4d2c3 uv-aarch64-unknown-linux-gnu/uv
-uv 0.13.0 darwin-arm64 astral-sh/uv uv-aarch64-apple-darwin.tar.gz a9c1b29002cf3c83f07fa9cd8a887a3be0107d90e23189721221e7257db8e3d6 uv-aarch64-apple-darwin/uv
+uv 0.13.1 linux-x86_64 astral-sh/uv uv-x86_64-unknown-linux-gnu.tar.gz eadd9d27c134ab5ac1ffd4473b97a741407f3ea238288f03121fc4deddf90220 uv-x86_64-unknown-linux-gnu/uv
+uv 0.13.1 linux-aarch64 astral-sh/uv uv-aarch64-unknown-linux-gnu.tar.gz 9041c73c99fdc5892cf128140beb354eca9231d502068cc36e6cb53a8e59ad14 uv-aarch64-unknown-linux-gnu/uv
+uv 0.13.1 darwin-arm64 astral-sh/uv uv-aarch64-apple-darwin.tar.gz cfe454573412ff7380d15fc7dae5997ab53ffce72fce0a78e91ddbc84001acd2 uv-aarch64-apple-darwin/uv
 "
 rules_commit=f1d2b562b414783763fd02a6ed2736eaed622efa
 rules_sha256=9a5f1cd5c625418cc1c776120123e2d4371df9bb66e099426b17c3488e13619d
