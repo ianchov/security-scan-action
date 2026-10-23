@@ -114,8 +114,10 @@ def test_the_comment_is_found_on_a_later_page():
 def test_a_refused_write_raises_with_the_status():
     api = FakeApi(fail="POST")
 
-    with pytest.raises(github.GitHubError, match="403"):
+    with pytest.raises(github.GitHubError, match="403") as refused:
         github.publish(PR, "tok", f"{MARKER}\nx", has_findings=True, urlopen=api)
+
+    assert refused.value.status == 403
 
 
 @pytest.mark.parametrize("event", ["pull_request", "pull_request_target"])

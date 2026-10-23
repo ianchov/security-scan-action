@@ -131,7 +131,13 @@ def _post_comment(results: list[ScanResult], env: dict[str, str]) -> None:
     try:
         action = github.publish(pr, token, body, has_findings)
     except github.GitHubError as error:
-        print(f"::warning::PR comment not posted: {error}. It needs pull-requests: write.")
+        hint = ""
+        if error.status in (401, 403, 404):
+            hint = (
+                " The token needs pull-requests: write; a pull request from a fork gets a "
+                "read-only token."
+            )
+        print(f"::warning::PR comment not posted: {error}.{hint}")
         return
     print(f"PR comment {action}.")
 

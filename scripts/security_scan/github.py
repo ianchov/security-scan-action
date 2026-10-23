@@ -17,7 +17,9 @@ Urlopen = Callable[..., Any]
 
 
 class GitHubError(Exception):
-    pass
+    def __init__(self, message: str, status: int | None = None) -> None:
+        super().__init__(message)
+        self.status = status
 
 
 @dataclass(frozen=True)
@@ -59,7 +61,7 @@ def _call(
         with urlopen(request, timeout=30) as response:
             return json.loads(response.read() or b"null"), response.headers
     except urllib.error.HTTPError as error:
-        raise GitHubError(f"GitHub {method} {url} returned {error.code}") from None
+        raise GitHubError(f"GitHub {method} {url} returned {error.code}", error.code) from None
     except (urllib.error.URLError, OSError) as error:
         raise GitHubError(f"GitHub {method} {url} failed: {error}") from None
 
