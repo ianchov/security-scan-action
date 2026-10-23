@@ -1,0 +1,160 @@
+{
+ "results": [
+  {
+   "check_id": "tmp.opengrep-rules-f1d2b562b414783763fd02a6ed2736eaed622efa.yaml.github-actions.security.run-shell-injection",
+   "path": ".github/workflows/greet.yml",
+   "start": {
+    "line": 6,
+    "col": 9,
+    "offset": 71
+   },
+   "end": {
+    "line": 6,
+    "col": 52,
+    "offset": 114
+   },
+   "extra": {
+    "metavars": {},
+    "message": "Using variable interpolation `${{...}}` with `github` context data in a `run:` step could allow an attacker to inject their own code into the runner. This would allow them to steal secrets and code. `github` context data can have arbitrary user input and should be treated as untrusted. Instead, use an intermediate environment variable with `env:` to store the data and use the environment variable in the `run:` script. Be sure to use double-quotes the environment variable, like this: \"$ENVVAR\".",
+    "metadata": {
+     "category": "security",
+     "cwe": [
+      "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+     ],
+     "owasp": [
+      "A01:2017 - Injection",
+      "A03:2021 - Injection"
+     ],
+     "references": [
+      "https://docs.github.com/en/actions/learn-github-actions/security-hardening-for-github-actions#understanding-the-risk-of-script-injections",
+      "https://securitylab.github.com/research/github-actions-untrusted-input/"
+     ],
+     "technology": [
+      "github-actions"
+     ],
+     "cwe2022-top25": true,
+     "cwe2021-top25": true,
+     "subcategory": [
+      "vuln"
+     ],
+     "likelihood": "HIGH",
+     "impact": "HIGH",
+     "confidence": "HIGH"
+    },
+    "severity": "ERROR",
+    "fingerprint": "a336ab0a4255eac884c0f8759143235b82209f3b7d243e61facdde482f322ee61a6bb2bda0dc0497c61c28d4f63fca45eea4663c3667048d6761525b9c112765_0",
+    "is_ignored": false,
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "tmp.opengrep-rules-f1d2b562b414783763fd02a6ed2736eaed622efa.python.lang.security.audit.dangerous-subprocess-use-audit",
+   "path": "app.py",
+   "start": {
+    "line": 5,
+    "col": 12,
+    "offset": 45
+   },
+   "end": {
+    "line": 5,
+    "col": 44,
+    "offset": 77
+   },
+   "extra": {
+    "metavars": {},
+    "message": "Detected subprocess function 'call' without a static string. If this data can be controlled by a malicious actor, it may be an instance of command injection. Audit the use of this call to ensure it is not controllable by an external resource. You may consider using 'shlex.escape()'.",
+    "metadata": {
+     "owasp": [
+      "A01:2017 - Injection",
+      "A03:2021 - Injection"
+     ],
+     "cwe": [
+      "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+     ],
+     "asvs": {
+      "control_id": "5.3.8 OS Command Injection",
+      "control_url": "https://github.com/OWASP/ASVS/blob/master/4.0/en/0x13-V5-Validation-Sanitization-Encoding.md#v53-output-encoding-and-injection-prevention-requirements",
+      "section": "V5: Validation, Sanitization and Encoding Verification Requirements",
+      "version": "4"
+     },
+     "references": [
+      "https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess",
+      "https://docs.python.org/3/library/subprocess.html",
+      "https://docs.python.org/3/library/shlex.html",
+      "https://semgrep.dev/docs/cheat-sheets/python-command-injection/"
+     ],
+     "category": "security",
+     "technology": [
+      "python"
+     ],
+     "confidence": "LOW",
+     "cwe2022-top25": true,
+     "cwe2021-top25": true,
+     "subcategory": [
+      "audit"
+     ],
+     "likelihood": "LOW",
+     "impact": "HIGH"
+    },
+    "severity": "ERROR",
+    "fingerprint": "8d8c380505d2b757a0af3c8f988ffbc6b70ae7cc0398fe156255ce571550fa7d4f443fc5f94af5b1f12e46e3d22d1020b5cd5eaa80befeab84313118eeda7115_0",
+    "is_ignored": false,
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  },
+  {
+   "check_id": "tmp.opengrep-rules-f1d2b562b414783763fd02a6ed2736eaed622efa.python.lang.security.audit.subprocess-shell-true",
+   "path": "app.py",
+   "start": {
+    "line": 5,
+    "col": 39,
+    "offset": 72
+   },
+   "end": {
+    "line": 5,
+    "col": 43,
+    "offset": 76
+   },
+   "extra": {
+    "metavars": {},
+    "message": "Found 'subprocess' function 'call' with 'shell=True'. This is dangerous because this call will spawn the command using a shell process. Doing so propagates current shell settings and variables, which makes it much easier for a malicious actor to execute commands. Use 'shell=False' instead.",
+    "fix": "False",
+    "metadata": {
+     "source-rule-url": "https://bandit.readthedocs.io/en/latest/plugins/b602_subprocess_popen_with_shell_equals_true.html",
+     "owasp": [
+      "A01:2017 - Injection",
+      "A03:2021 - Injection"
+     ],
+     "cwe": [
+      "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+     ],
+     "references": [
+      "https://stackoverflow.com/questions/3172470/actual-meaning-of-shell-true-in-subprocess",
+      "https://docs.python.org/3/library/subprocess.html"
+     ],
+     "category": "security",
+     "technology": [
+      "python"
+     ],
+     "cwe2022-top25": true,
+     "cwe2021-top25": true,
+     "subcategory": [
+      "secure default"
+     ],
+     "likelihood": "HIGH",
+     "impact": "LOW",
+     "confidence": "MEDIUM"
+    },
+    "severity": "ERROR",
+    "fingerprint": "5ee1af33c56aaf58314fea704adea1abb5c4cbe1dbf07111ee3ff3eb05b2a25d8a0ec7e8b90e6a0d74027a5866291f2ab45ca1a87b708817ef787f234b3c6bdc_0",
+    "is_ignored": false,
+    "validation_state": "NO_VALIDATOR",
+    "engine_kind": "OSS"
+   }
+  }
+ ],
+ "errors": [],
+ "version": "1.31.0"
+}

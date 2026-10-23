@@ -17,6 +17,15 @@ inputs:
       Extra paths for opengrep, bandit, osv-scanner and trivy to skip, one per line, for example "app/staticfiles".
       .venv and test files are always skipped.
     default: ""
+  pr-comment:
+    description: >-
+      "true" posts the findings as one pull request comment, with the place, the reason and the change for each,
+      and updates that comment on later runs. Needs the pull-requests: write permission. A clean scan only
+      updates an earlier comment. A comment that cannot be posted is a warning, not a failure.
+    default: "false"
+  github-token:
+    description: Token for the pull request comment. The default is the workflow token.
+    default: ${{ github.token }}
 
 runs:
   using: composite
@@ -30,4 +39,6 @@ runs:
       env:
         RULE_PACKS: ${{ inputs.rule-packs }}
         SCAN_EXCLUDE: ${{ inputs.exclude }}
-      run: bash "$GITHUB_ACTION_PATH/scripts/security-scan.sh"
+        PR_COMMENT: ${{ inputs.pr-comment }}
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+      run: python3 "$GITHUB_ACTION_PATH/scripts/security-scan.py"

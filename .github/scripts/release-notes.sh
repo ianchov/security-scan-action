@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Print a release title (first line) and release notes (the rest) from the pinned versions that
-# changed between two commits: scanners in scripts/security-scan.sh, packages in
-# scripts/bandit-requirements.txt.
+# changed between two commits: scanners in scripts/pins.txt (scripts/security-scan.sh in older
+# releases), packages in scripts/bandit-requirements.txt.
 #   release-notes.sh TAG OLD_REF NEW_REF
 set -euo pipefail
 shopt -s inherit_errexit
@@ -11,7 +11,7 @@ tag=$1 old=$2 new=$3
 # pins REF: "name version" per pinned tool or package at REF, sorted by name.
 pins() {
   # A table row has a 64-hex sha256 column. Its position moved once, so search for it.
-  git show "$1:scripts/security-scan.sh" | awk 'NF >= 5 { for (i = 4; i <= NF; i++)
+  { git show "$1:scripts/pins.txt" 2>/dev/null || git show "$1:scripts/security-scan.sh"; } | awk 'NF >= 5 { for (i = 4; i <= NF; i++)
     if (length($i) == 64 && $i ~ /^[0-9a-f]+$/) { sub(/^v/, "", $2); print $1, $2; next } }'
   git show "$1:scripts/bandit-requirements.txt" | awk -F'==' '/^[A-Za-z0-9_.-]+==/ {
     split($2, v, /[ ;]/); print tolower($1), v[1] }'
