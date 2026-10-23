@@ -27,9 +27,11 @@ class Response(io.BytesIO):
 
 
 class FakeApi:
-    def __init__(self, pages=None, fail=None):
+    def __init__(self, pages=None, fail=None, outages=()):
         self.pages = pages or {COMMENTS: ([], None)}
         self.fail = fail
+        # (method, HTTP status or None for a network error, whether the write landed first)
+        self.outages = list(outages)
         self.requests = []
 
     def __call__(self, request, timeout):
@@ -37,6 +39,15 @@ class FakeApi:
         self.requests.append(
             (request.get_method(), request.full_url, request.get_header("Authorization"), body)
         )
+        if self.outages and self.outages[0][0] == request.get_method():
+            _, status, landed = self.outages.pop(0)
+            if landed:
+                self.pages[COMMENTS][0].append(comment(99, (body or {})["body"]))
+            if status is None:
+                raise urllib.error.URLError("Connection reset by peer")
+            raise urllib.error.HTTPError(
+                request.full_url, status, "Error", Message(), io.BytesIO(b"{}")
+            )
         if self.fail and request.get_method() == self.fail:
             raise urllib.error.HTTPError(
                 request.full_url, 403, "Forbidden", Message(), io.BytesIO(b"{}")
@@ -118,6 +129,69 @@ def test_a_refused_write_raises_with_the_status():
         github.publish(PR, "tok", f"{MARKER}\nx", has_findings=True, urlopen=api)
 
     assert refused.value.status == 403
+
+
+def test_a_server_error_is_retried_after_a_backoff():
+    api = FakeApi(outages=[("POST", 502, False)])
+    sleeps = []
+
+    action = github.publish(
+        PR, "tok", f"{MARKER}\nx", has_findings=True, urlopen=api, sleep=sleeps.append
+    )
+
+    assert action == "created"
+    assert [m for m, _, _ in api.writes()] == ["POST", "POST"]
+    assert sleeps == [2]
+
+
+def test_network_errors_are_retried_with_a_growing_wait():
+    api = FakeApi(outages=[("GET", None, False), ("GET", None, False)])
+    sleeps = []
+
+    action = github.publish(
+        PR, "tok", f"{MARKER}\nx", has_findings=True, urlopen=api, sleep=sleeps.append
+    )
+
+    assert action == "created"
+    assert sleeps == [2, 4]
+
+
+def test_a_comment_that_landed_before_the_error_is_updated_not_posted_twice():
+    api = FakeApi(outages=[("POST", 502, True)])
+
+    action = github.publish(
+        PR, "tok", f"{MARKER}\nx", has_findings=True, urlopen=api, sleep=lambda _: None
+    )
+
+    assert action == "updated"
+    assert [m for m, _, _ in api.writes()] == ["POST", "PATCH"]
+
+
+def test_a_refusal_is_not_retried():
+    api = FakeApi(fail="POST")
+    sleeps = []
+
+    with pytest.raises(github.GitHubError, match="403"):
+        github.publish(
+            PR, "tok", f"{MARKER}\nx", has_findings=True, urlopen=api, sleep=sleeps.append
+        )
+
+    assert [m for m, _, _ in api.writes()] == ["POST"]
+    assert sleeps == []
+
+
+def test_a_lasting_server_error_gives_up_after_three_attempts():
+    api = FakeApi(outages=[("POST", 503, False)] * 3)
+    sleeps = []
+
+    with pytest.raises(github.GitHubError, match="503") as failed:
+        github.publish(
+            PR, "tok", f"{MARKER}\nx", has_findings=True, urlopen=api, sleep=sleeps.append
+        )
+
+    assert failed.value.status == 503
+    assert [m for m, _, _ in api.writes()] == ["POST"] * 3
+    assert sleeps == [2, 4]
 
 
 @pytest.mark.parametrize("event", ["pull_request", "pull_request_target"])

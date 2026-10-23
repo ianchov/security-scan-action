@@ -1,5 +1,6 @@
 import json
 import re
+import time
 import urllib.error
 import urllib.request
 from collections.abc import Callable
@@ -13,13 +14,17 @@ from .report import MARKER
 # planted comment cannot be overwritten or used to hide the findings.
 BOT_LOGIN = "github-actions[bot]"
 MAX_PAGES = 20
+ATTEMPTS = 3
+BACKOFF_SECONDS = 2
+RETRY_STATUSES = frozenset({429, 500, 502, 503, 504})
 Urlopen = Callable[..., Any]
 
 
 class GitHubError(Exception):
-    def __init__(self, message: str, status: int | None = None) -> None:
+    def __init__(self, message: str, status: int | None = None, retryable: bool = False) -> None:
         super().__init__(message)
         self.status = status
+        self.retryable = retryable
 
 
 @dataclass(frozen=True)
@@ -61,9 +66,10 @@ def _call(
         with urlopen(request, timeout=30) as response:
             return json.loads(response.read() or b"null"), response.headers
     except urllib.error.HTTPError as error:
-        raise GitHubError(f"GitHub {method} {url} returned {error.code}", error.code) from None
+        message = f"GitHub {method} {url} returned {error.code}"
+        raise GitHubError(message, error.code, error.code in RETRY_STATUSES) from None
     except (urllib.error.URLError, OSError) as error:
-        raise GitHubError(f"GitHub {method} {url} failed: {error}") from None
+        raise GitHubError(f"GitHub {method} {url} failed: {error}", retryable=True) from None
 
 
 def _next_page(headers: Any) -> str | None:
@@ -93,6 +99,23 @@ def publish(
     body: str,
     has_findings: bool,
     urlopen: Urlopen = urllib.request.urlopen,
+    sleep: Callable[[float], None] = time.sleep,
+) -> str:
+    # Each attempt looks for our comment again: a POST that reached GitHub before its error
+    # is then updated, not posted twice.
+    attempt = 1
+    while True:
+        try:
+            return _publish_once(pr, token, body, has_findings, urlopen)
+        except GitHubError as error:
+            if not error.retryable or attempt == ATTEMPTS:
+                raise
+        sleep(BACKOFF_SECONDS * 2 ** (attempt - 1))
+        attempt += 1
+
+
+def _publish_once(
+    pr: PullRequest, token: str, body: str, has_findings: bool, urlopen: Urlopen
 ) -> str:
     existing = _our_comment(pr, token, urlopen)
     if existing is not None:
