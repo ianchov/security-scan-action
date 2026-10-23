@@ -6,9 +6,9 @@
   "customManagers": [
     {
       "customType": "regex",
-      "description": "Scanner release tags and asset sha256 sums in scripts/security-scan.sh. One dependency per table row, so each platform's digest is updated.",
+      "description": "Scanner release tags and asset sha256 sums in scripts/pins.txt. One dependency per table row, so each platform's digest is updated.",
       "managerFilePatterns": [
-        "/^scripts/security-scan\\.sh$/"
+        "/^scripts/pins\\.txt$/"
       ],
       "matchStrings": [
         "\\n(?<depName>[a-z-]+) (?<currentValue>\\S+) [\\w-]+ (?<packageName>[\\w.-]+/[\\w.-]+) \\S+ (?<currentDigest>[0-9a-f]{64})"
@@ -17,7 +17,7 @@
     },
     {
       "customType": "regex",
-      "description": "Scanner versions in the README table. Same depName as the scripts/security-scan.sh rows, so Renovate puts both in one pull request.",
+      "description": "Scanner versions in the README table. Same depName as the scripts/pins.txt rows, so Renovate puts both in one pull request.",
       "managerFilePatterns": [
         "/^README\\.md$/"
       ],
@@ -41,9 +41,9 @@
   ],
   "packageRules": [
     {
-      "description": "Scanners (scripts/security-scan.sh), bandit with its hash-locked packages (scripts/bandit-requirements.txt) and their versions in README.md: wait 3 days after a release, then Renovate merges minor and patch updates once Self test passes.",
+      "description": "Scanners (scripts/pins.txt), bandit with its hash-locked packages (scripts/bandit-requirements.txt) and their versions in README.md: wait 3 days after a release, then Renovate merges minor and patch updates once Self test passes.",
       "matchFileNames": [
-        "scripts/security-scan.sh",
+        "scripts/pins.txt",
         "scripts/bandit-requirements.txt",
         "README.md"
       ],
@@ -51,7 +51,7 @@
     },
     {
       "matchFileNames": [
-        "scripts/security-scan.sh",
+        "scripts/pins.txt",
         "scripts/bandit-requirements.txt",
         "README.md"
       ],

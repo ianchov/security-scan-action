@@ -11,6 +11,22 @@ permissions:
   contents: read
 
 jobs:
+  tests:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: astral-sh/setup-uv@v10
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      # SECURITY_SCAN_E2E runs the real scanners on a repository with planted findings,
+      # against a local stand-in for the GitHub API.
+      - run: uv run pytest -q
+        env:
+          SECURITY_SCAN_E2E: "1"
+
   scan:
     strategy:
       fail-fast: false
@@ -33,5 +49,5 @@ jobs:
           git -C "$fixture" add app.py
           git -C "$fixture" -c user.name=ci -c user.email=ci@example.invalid commit -qm fixture
           cd "$fixture"
-          bash "$GITHUB_WORKSPACE/scripts/security-scan.sh" | tee "$RUNNER_TEMP/scan.log"
+          python3 "$GITHUB_WORKSPACE/scripts/security-scan.py" | tee "$RUNNER_TEMP/scan.log"
           grep -qx 'bandit (Python SAST): passed' "$RUNNER_TEMP/scan.log"

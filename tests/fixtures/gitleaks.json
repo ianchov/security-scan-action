@@ -1,0 +1,38 @@
+[
+ {
+  "RuleID": "github-pat",
+  "Description": "Uncovered a GitHub Personal Access Token, potentially leading to unauthorized repository access and sensitive content exposure.",
+  "StartLine": 1,
+  "EndLine": 1,
+  "StartColumn": 10,
+  "EndColumn": 49,
+  "Match": "NOT-REDACTED-SENTINEL",
+  "Secret": "NOT-REDACTED-SENTINEL",
+  "File": "settings.py",
+  "SymlinkFile": "",
+  "Commit": "fb4f67264eea9c1ee339286fec0605dec0742c28",
+  "Entropy": 5.171928,
+  "Tags": [],
+  "Fingerprint": "fb4f67264eea9c1ee339286fec0605dec0742c28:settings.py:github-pat:1",
+  "Author": "dev",
+  "Email": "dev@example.invalid"
+ },
+ {
+  "RuleID": "generic-api-key",
+  "Description": "Detected a Generic API Key, potentially exposing access to various services and sensitive operations.",
+  "StartLine": 1,
+  "EndLine": 1,
+  "StartColumn": 1,
+  "EndColumn": 51,
+  "Match": "token = \"REDACTED\"",
+  "Secret": "REDACTED",
+  "File": "settings.py",
+  "SymlinkFile": "",
+  "Commit": "fb4f67264eea9c1ee339286fec0605dec0742c28",
+  "Entropy": 5.2112107,
+  "Tags": [],
+  "Fingerprint": "fb4f67264eea9c1ee339286fec0605dec0742c28:settings.py:generic-api-key:1",
+  "Author": "dev",
+  "Email": "dev@example.invalid"
+ }
+]

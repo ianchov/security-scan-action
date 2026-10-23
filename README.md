@@ -18,6 +18,12 @@ Each run writes a summary to the log and to the job summary page: the result of 
 version, sha256 and source of each tool, the opengrep-rules commit and packs, the bandit packages,
 and what each scanner skips. Reviewers see what ran without opening this repository.
 
+When a scanner fails, the log and the job summary list each finding: where it is (file and line,
+or the lockfile), the rule, why it matters, and what to change. For a vulnerable dependency, the
+change names the lowest version that fixes every known advisory. With `pr-comment: true`, the same
+list goes into one pull request comment, which later runs update. A secret is never shown: gitleaks
+runs with `--redact`, and only its file, line, rule and fingerprint are reported.
+
 bandit catches what the opengrep ERROR gate lets through, such as `pickle.loads` and `eval`.
 It runs from a temporary venv built with a pinned uv from `scripts/bandit-requirements.txt`,
 which pins every package by hash. uv uses the repository's Python version (`.python-version`,
@@ -40,6 +46,7 @@ on:
 
 permissions:
   contents: read
+  pull-requests: write # only for pr-comment
 
 jobs:
   scan:
@@ -47,17 +54,21 @@ jobs:
     steps:
       - uses: ianchov/security-scan-action@v1
         with:
+          pr-comment: true
           exclude: |
             app/staticfiles
 ```
 
 The action checks out the repository itself with full history (`fetch-depth: 0`) and without
-persisted credentials.
+persisted credentials. It needs `python3` 3.10 or later on the runner (GitHub's Ubuntu images
+have it) and no Python packages.
 
 | Input | Default | Meaning |
 |---|---|---|
 | `rule-packs` | default set | [opengrep-rules](https://github.com/opengrep/opengrep-rules) directories, space or newline separated. Globs such as `javascript/*/security` work. The default: `python/{lang,django,requests,jwt,cryptography,jinja2}/security`, `yaml/github-actions/security`, `yaml/docker-compose/security`, `bash/*/security`, `json/*/security`, `javascript/*/security`, `go/*/security`, `rust/*/security`, `html/security`. |
 | `exclude` | empty | Extra paths for opengrep, bandit, osv-scanner and trivy to skip, one per line. `.venv` and test files (`tests/`, `tests.py`, `test_*.py`, `*_test.py`, `conftest.py`) are always skipped by opengrep and bandit. |
+| `pr-comment` | `false` | `true` posts the findings as one pull request comment and updates it on later runs. A clean scan only updates an earlier comment. Needs `pull-requests: write`. On a pull request from a fork the workflow token cannot comment: the run logs a warning and the scan result does not change. |
+| `github-token` | the workflow token | Token for the pull request comment. |
 
 ## Exceptions
 
@@ -72,7 +83,7 @@ Exceptions live in the scanned repository:
 
 ## Pinning
 
-`scripts/security-scan.sh` holds each tool's release tag and the sha256 of each release asset for
+`scripts/pins.txt` holds each tool's release tag and the sha256 of each release asset for
 Linux x86_64, Linux aarch64 and macOS arm64. Nothing runs before its digest matches. The first
 digests came from each tool's upstream checksum file. opengrep publishes none: its first digests
 and the opengrep-rules commit came from
@@ -93,7 +104,18 @@ never run.
 ## Run locally
 
 ```bash
-bash scripts/security-scan.sh
+python3 scripts/security-scan.py
+```
+
+## Development
+
+The action is a standard-library Python package in `scripts/security_scan/`. The tests need
+[uv](https://docs.astral.sh/uv/):
+
+```bash
+uv run pytest -q                        # unit tests
+SECURITY_SCAN_E2E=1 uv run pytest -q    # also a real scan of a repository with planted findings
+uv run ruff check . && uv run ruff format --check .
 ```
 
 ## Releases

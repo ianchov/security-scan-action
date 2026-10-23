@@ -1,0 +1,108 @@
+{
+ "results": [
+  {
+   "source": {
+    "path": "/tmp/ssa-fixture/requirements.txt",
+    "type": "lockfile"
+   },
+   "packages": [
+    {
+     "package": {
+      "name": "requests",
+      "version": "2.19.0",
+      "ecosystem": "PyPI",
+      "purl": "pkg:pypi/requests@2.19.0"
+     },
+     "groups": [
+      {
+       "ids": [
+        "PYSEC-2018-28",
+        "GHSA-x84v-xcm2-53pg"
+       ],
+       "aliases": [
+        "CVE-2018-18074",
+        "GHSA-x84v-xcm2-53pg",
+        "PYSEC-2018-28"
+       ],
+       "max_severity": "7.5"
+      },
+      {
+       "ids": [
+        "PYSEC-2023-74",
+        "GHSA-j8r2-6x86-q33q"
+       ],
+       "aliases": [
+        "CVE-2023-32681",
+        "GHSA-j8r2-6x86-q33q",
+        "PYSEC-2023-74"
+       ],
+       "max_severity": "6.1"
+      }
+     ],
+     "vulnerabilities": [
+      {
+       "id": "PYSEC-2018-28",
+       "aliases": [
+        "CVE-2018-18074",
+        "GHSA-x84v-xcm2-53pg"
+       ],
+       "affected": [
+        {
+         "package": {
+          "ecosystem": "PyPI",
+          "name": "requests",
+          "purl": "pkg:pypi/requests"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "0"
+            },
+            {
+             "fixed": "2.20.0"
+            }
+           ],
+           "type": "ECOSYSTEM"
+          }
+         ]
+        }
+       ],
+       "details": "The Requests package before 2.20.0 for Python sends an HTTP Authorization header to an http URI upon receiving a same-hostname https-to-http redirect, which makes it easier for remote attackers to discover credentials by sniffing the networ"
+      },
+      {
+       "id": "PYSEC-2023-74",
+       "aliases": [
+        "CVE-2023-32681",
+        "GHSA-j8r2-6x86-q33q"
+       ],
+       "affected": [
+        {
+         "package": {
+          "ecosystem": "PyPI",
+          "name": "requests",
+          "purl": "pkg:pypi/requests"
+         },
+         "ranges": [
+          {
+           "events": [
+            {
+             "introduced": "2.3.0"
+            },
+            {
+             "fixed": "2.31.0"
+            }
+           ],
+           "type": "ECOSYSTEM"
+          }
+         ]
+        }
+       ],
+       "details": "Requests is a HTTP library. Since Requests 2.3.0, Requests has been leaking Proxy-Authorization headers to destination servers when redirected to an HTTPS endpoint. This is a product of how we use `rebuild_proxies` to reattach the `Proxy-Au"
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
