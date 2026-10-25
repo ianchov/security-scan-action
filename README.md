@@ -7,7 +7,7 @@ workflow in [ianchov/security-scan](https://github.com/ianchov/security-scan).
 | Category | Scanner | Fails on |
 |---|---|---|
 | Secrets | [gitleaks](https://github.com/gitleaks/gitleaks) 8.30.1 | any secret in the full git history, on pull requests too |
-| SAST | [opengrep](https://github.com/opengrep/opengrep) 1.31.0 | ERROR-severity findings |
+| SAST | [opengrep](https://github.com/opengrep/opengrep) 1.32.0 | ERROR-severity findings |
 | Python SAST | [bandit](https://github.com/PyCQA/bandit) 1.9.4, only when the repository has `.py` files | MEDIUM and HIGH severity findings |
 | Dependencies | [osv-scanner](https://github.com/google/osv-scanner) 2.7.0 | any known vulnerability in a lockfile; a repository without one passes |
 | Dockerfile, IaC | [trivy](https://github.com/aquasecurity/trivy) `config` 0.76.1 | HIGH and CRITICAL misconfigurations |
